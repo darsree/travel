@@ -29,6 +29,9 @@ app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(trips_router, prefix="/api/trips", tags=["trips"])
 app.include_router(expenses_router, prefix="/api/expenses", tags=["expenses"])
 app.include_router(dashboard_router, prefix="/api/dashboard", tags=["dashboard"])
+@app.get("/")
+def home():
+    return {"status": "success", "message": "Travel Planner API is active. Visit /docs for details."}
 
 # Serve React frontend (after build)
 frontend_dist = Path(__file__).parent.parent / "frontend" / "dist"
