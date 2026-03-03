@@ -21,6 +21,29 @@ async def lifespan(app: FastAPI):
     init_db()
     yield
 
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+
+# 1. Mount the frontend build directory
+# This assumes your 'dist' folder is inside 'frontend'
+if os.path.exists("frontend/dist"):
+    app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
+
+# 2. Create a "Catch-all" route to serve index.html
+@app.get("/{catchall:path}")
+async def serve_frontend(catchall: str):
+    # If the user asks for an API, let FastAPI handle it normally
+    if catchall.startswith("api"):
+        return None 
+    
+    # Otherwise, return the React index.html
+    index_path = os.path.join("frontend/dist", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    
+    return {"message": "Frontend build not found. Did you run npm run build?"}
+
 
 app = FastAPI(title="AI Smart Travel Planner", lifespan=lifespan)
 
